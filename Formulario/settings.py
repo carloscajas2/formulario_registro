@@ -10,7 +10,7 @@ SECRET_KEY = 'una_clave_secreta_muy_segura'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.3','192.168.0.6']
 
 # Application definition
 INSTALLED_APPS = [
@@ -94,3 +94,4 @@ STATIC_URL = '/static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
