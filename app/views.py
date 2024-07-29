@@ -18,6 +18,10 @@ def login_view(request):
             messages.error(request, 'Usuario o contraseña incorrectos')
     return render(request, 'login.html')
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Agencia, Registro  # Asegúrate de importar los modelos correctos
+
 def manage_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -34,32 +38,66 @@ def manage_view(request):
     else:
         agencias = Agencia.objects.all()
 
-    registros = Registro.objects.all()
-    last_update = registros.latest('timestamp').timestamp if registros.exists() else None
+    agencias_datos = []
+    for agencia in agencias:
+        data = {
+            'agencia': agencia,
+            'ventanilla': {
+                'contratados': 0, 'conectados': 0, 'vacaciones': 0, 'bajas': 0, 'otros_roles': 0
+            },
+            'plataforma': {
+                'contratados': 0, 'conectados': 0, 'vacaciones': 0, 'bajas': 0, 'otros_roles': 0
+            }
+        }
+        ventanilla = Registro.objects.filter(agencia=agencia.nom_age, area='Ventanilla').order_by('-timestamp').first()
+        plataforma = Registro.objects.filter(agencia=agencia.nom_age, area='Plataforma').order_by('-timestamp').first()
+        
+        if ventanilla:
+            data['ventanilla'].update({
+                'contratados': ventanilla.contratados,
+                'conectados': ventanilla.conectados,
+                'vacaciones': ventanilla.vacaciones,
+                'bajas': ventanilla.bajas,
+                'otros_roles': ventanilla.otros_roles
+            })
+        
+        if plataforma:
+            data['plataforma'].update({
+                'contratados': plataforma.contratados,
+                'conectados': plataforma.conectados,
+                'vacaciones': plataforma.vacaciones,
+                'bajas': plataforma.bajas,
+                'otros_roles': plataforma.otros_roles
+            })
+        
+        agencias_datos.append(data)
 
     if request.method == 'POST':
-        for agencia in agencias:
+        for data in agencias_datos:
             Registro.objects.create(
-                agencia=agencia.nom_age,
+                agencia=data['agencia'].nom_age,
                 area='Ventanilla',
-                contratados=request.POST.get(f'contratados_vent_{agencia.id_age}', 0),
-                conectados=request.POST.get(f'conectados_vent_{agencia.id_age}', 0),
-                vacaciones=request.POST.get(f'vacaciones_vent_{agencia.id_age}', 0),
-                bajas=request.POST.get(f'bajas_vent_{agencia.id_age}', 0),
-                otros_roles=request.POST.get(f'otros_roles_vent_{agencia.id_age}', 0)
+                contratados=request.POST.get(f'contratados_vent_{data['agencia'].id_age}', 0),
+                conectados=request.POST.get(f'conectados_vent_{data['agencia'].id_age}', 0),
+                vacaciones=request.POST.get(f'vacaciones_vent_{data['agencia'].id_age}', 0),
+                bajas=request.POST.get(f'bajas_vent_{data['agencia'].id_age}', 0),
+                otros_roles=request.POST.get(f'otros_roles_vent_{data['agencia'].id_age}', 0)
             )
             Registro.objects.create(
-                agencia=agencia.nom_age,
+                agencia=data['agencia'].nom_age,
                 area='Plataforma',
-                contratados=request.POST.get(f'contratados_plat_{agencia.id_age}', 0),
-                conectados=request.POST.get(f'conectados_plat_{agencia.id_age}', 0),
-                vacaciones=request.POST.get(f'vacaciones_plat_{agencia.id_age}', 0),
-                bajas=request.POST.get(f'bajas_plat_{agencia.id_age}', 0),
-                otros_roles=request.POST.get(f'otros_roles_plat_{agencia.id_age}', 0)
+                contratados=request.POST.get(f'contratados_plat_{data['agencia'].id_age}', 0),
+                conectados=request.POST.get(f'conectados_plat_{data['agencia'].id_age}', 0),
+                vacaciones=request.POST.get(f'vacaciones_plat_{data['agencia'].id_age}', 0),
+                bajas=request.POST.get(f'bajas_plat_{data['agencia'].id_age}', 0),
+                otros_roles=request.POST.get(f'otros_roles_plat_{data['agencia'].id_age}', 0)
             )
         messages.success(request, 'Registro guardado con éxito')
 
-    return render(request, 'form.html', {'agencias': agencias, 'last_update': last_update})
+    return render(request, 'form.html', {
+        'agencias_datos': agencias_datos,
+        'last_update': Registro.objects.latest('timestamp').timestamp if Registro.objects.exists() else None
+    })
 
 def download_csv(request):
     registros = Registro.objects.all()
