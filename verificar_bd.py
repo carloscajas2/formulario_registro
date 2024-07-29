@@ -1,27 +1,22 @@
 import sqlite3
+import os
 
-# Ruta a tu base de datos SQLite
-database_path = 'db.sqlite3'
+def verificar_tablas(db_path):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
 
-# Conectar a la base de datos
-conn = sqlite3.connect(database_path)
-cursor = conn.cursor()
+    tablas = ['app_agencia', 'app_registro']
 
-# Verificar si la tabla agencia existe
-cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='app_agencia';")
-table_exists = cursor.fetchone()
+    for tabla in tablas:
+        cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{tabla}';")
+        result = cursor.fetchone()
+        if result:
+            print(f"La tabla '{tabla}' existe.")
+        else:
+            print(f"La tabla '{tabla}' no existe.")
 
-if table_exists:
-    print("La tabla 'app_agencia' existe.")
-    
-    # Listar contenido de la tabla agencia
-    cursor.execute("SELECT * FROM app_agencia;")
-    rows = cursor.fetchall()
-    
-    for row in rows:
-        print(row)
-else:
-    print("La tabla 'app_agencia' no existe.")
+    conn.close()
 
-# Cerrar la conexión
-conn.close()
+if __name__ == "__main__":
+    db_path = os.path.join(os.path.dirname(__file__), 'db.sqlite3')
+    verificar_tablas(db_path)
