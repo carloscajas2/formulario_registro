@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
 from .models import Agencia, Registro
 import csv
+from io import StringIO
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -39,12 +41,12 @@ def manage_view(request):
         data = {
             'agencia': agencia,
             'ventanilla': {
-                'Contratados': 0, 'Conectados': 0, 'Nuevos': 0, 'Bajas Medicas': 0, 'Remplazo Plataforma/RAC': 0,
-                'Externas y Autobancos': 0, 'Promotor Offline': 0
+                'contratados': 0, 'conectados': 0, 'nuevos': 0, 'bajas_medicas': 0, 'remplazo_plataforma_rac': 0,
+                'externas_y_autobancos': 0, 'promotor_offline': 0
             },
             'plataforma': {
-                'Contratados': 0, 'Conectados': 0, 'Nuevos': 0, 'Bajas Medicas': 0, 'Remplazo Plataforma/RAC': 0,
-                'Externas y Autobancos': 0, 'Promotor Offline': 0
+                'contratados': 0, 'conectados': 0, 'nuevos': 0, 'bajas_medicas': 0, 'remplazo_plataforma_rac': 0,
+                'externas_y_autobancos': 0, 'promotor_offline': 0
             }
         }
         ventanilla = Registro.objects.filter(agencia=agencia.nom_age, area='Ventanilla').order_by('-timestamp').first()
@@ -52,24 +54,24 @@ def manage_view(request):
 
         if ventanilla:
             data['ventanilla'].update({
-                'Contratados': ventanilla.contratados,
-                'Conectados': ventanilla.conectados,
-                'Nuevos': ventanilla.nuevos,
-                'Bajas Medicas': ventanilla.bajas_medicas,
-                'Remplazo Plataforma/RAC': ventanilla.remplazo_plataforma_rac,
-                'Externas y Autobancos': ventanilla.externas_y_autobancos,
-                'Promotor Offline': ventanilla.promotor_offline
+                'contratados': ventanilla.contratados,
+                'conectados': ventanilla.conectados,
+                'nuevos': ventanilla.nuevos,
+                'bajas_medicas': ventanilla.bajas_medicas,
+                'remplazo_plataforma_rac': ventanilla.remplazo_plataforma_rac,
+                'externas_y_autobancos': ventanilla.externas_y_autobancos,
+                'promotor_offline': ventanilla.promotor_offline
             })
 
         if plataforma:
             data['plataforma'].update({
-                'Contratados': plataforma.contratados,
-                'Conectados': plataforma.conectados,
-                'Nuevos': plataforma.nuevos,
-                'Bajas Medicas': plataforma.bajas_medicas,
-                'Remplazo Plataforma/RAC': plataforma.remplazo_plataforma_rac,
-                'Externas y Autobancos': plataforma.externas_y_autobancos,
-                'Promotor Offline': plataforma.promotor_offline
+                'contratados': plataforma.contratados,
+                'conectados': plataforma.conectados,
+                'nuevos': plataforma.nuevos,
+                'bajas_medicas': plataforma.bajas_medicas,
+                'remplazo_plataforma_rac': plataforma.remplazo_plataforma_rac,
+                'externas_y_autobancos': plataforma.externas_y_autobancos,
+                'promotor_offline': plataforma.promotor_offline
             })
 
         agencias_datos.append(data)
@@ -100,10 +102,7 @@ def manage_view(request):
             )
         messages.success(request, 'Registro guardado con éxito')
 
-    return render(request, 'form.html', {
-        'agencias_datos': agencias_datos,
-        'last_update': Registro.objects.latest('timestamp').timestamp if Registro.objects.exists() else None
-    })
+    return render(request, 'form.html', {'agencias_datos': agencias_datos})
 
 
 def download_csv(request):
@@ -112,12 +111,12 @@ def download_csv(request):
     response['Content-Disposition'] = 'attachment; filename=registros_agencias.csv'
 
     writer = csv.writer(response)
-    writer.writerow(
-        ['Agencia', 'Área', 'Contratados', 'Conectados', 'Nuevos', 'Bajas Medicas', 'Remplazo Plataforma/RAC',
-         'Externas y Autobancos', 'Promotor Offline', 'Timestamp'])
+    writer.writerow(['Agencia', 'Área', 'Contratados', 'Conectados', 'Vacaciones', 'Nuevos', 'Bajas Medicas',
+                     'Remplazo Plataforma/RAC', 'Externas y Autobancos', 'Promotor Offline', 'Timestamp'])
     for registro in registros:
-        writer.writerow([registro.agencia, registro.area, registro.contratados, registro.conectados, registro.nuevos,
-                         registro.bajas_medicas, registro.remplazo_plataforma_rac, registro.externas_y_autobancos,
-                         registro.promotor_offline, registro.timestamp])
+        writer.writerow(
+            [registro.agencia, registro.area, registro.contratados, registro.conectados, registro.vacaciones,
+             registro.nuevos, registro.bajas_medicas, registro.remplazo_plataforma_rac, registro.externas_y_autobancos,
+             registro.promotor_offline, registro.timestamp])
 
     return response
