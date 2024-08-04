@@ -9,9 +9,12 @@ class Agencia(models.Model):
 class Registro(models.Model):
     agencia = models.CharField(max_length=50)
     area = models.CharField(max_length=50)
-    contratados = models.IntegerField()
-    conectados = models.IntegerField()
-    vacaciones = models.IntegerField()
-    bajas = models.IntegerField()
-    otros_roles = models.IntegerField()
+    contratados = models.IntegerField(default=0)
+    conectados = models.IntegerField(default=0)
+    vacaciones = models.IntegerField(default=0)
+    nuevos = models.IntegerField(default=0)  # Nuevo campo con valor predeterminado
+    bajas_medicas = models.IntegerField(default=0)  # Nuevo campo con valor predeterminado
+    remplazo_plataforma_rac = models.IntegerField(default=0)  # Nuevo campo con valor predeterminado
+    externas_y_autobancos = models.IntegerField(default=0)  # Nuevo campo con valor predeterminado
+    promotor_offline = models.IntegerField(default=0)  # Nuevo campo con valor predeterminado
     timestamp = models.DateTimeField(auto_now_add=True)

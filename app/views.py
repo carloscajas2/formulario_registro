@@ -4,19 +4,6 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
 from .models import Agencia, Registro
 import csv
-from io import StringIO
-
-
-def some_view(request):
-    user_name = request.user.username  # Asegúrate de que el usuario esté autenticado
-    context = {
-        'user_name': user_name,
-        'last_update': '2024-08-02',  # Ejemplo, debería ser dinámico
-        'agencias_datos': [],  # Otros datos necesarios para la plantilla
-        'messages': [],  # Otros mensajes necesarios para la plantilla
-    }
-    return render(request, 'template.html', context)
-
 
 def login_view(request):
     if request.method == 'POST':
@@ -30,9 +17,6 @@ def login_view(request):
             messages.error(request, 'Usuario o contraseña incorrectos')
     return render(request, 'login.html')
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import Agencia, Registro  # Asegúrate de importar los modelos correctos
 
 def manage_view(request):
     if not request.user.is_authenticated:
@@ -55,33 +39,39 @@ def manage_view(request):
         data = {
             'agencia': agencia,
             'ventanilla': {
-                'contratados': 0, 'conectados': 0, 'vacaciones': 0, 'bajas': 0, 'otros_roles': 0
+                'Contratados': 0, 'Conectados': 0, 'Nuevos': 0, 'Bajas Medicas': 0, 'Remplazo Plataforma/RAC': 0,
+                'Externas y Autobancos': 0, 'Promotor Offline': 0
             },
             'plataforma': {
-                'contratados': 0, 'conectados': 0, 'vacaciones': 0, 'bajas': 0, 'otros_roles': 0
+                'Contratados': 0, 'Conectados': 0, 'Nuevos': 0, 'Bajas Medicas': 0, 'Remplazo Plataforma/RAC': 0,
+                'Externas y Autobancos': 0, 'Promotor Offline': 0
             }
         }
         ventanilla = Registro.objects.filter(agencia=agencia.nom_age, area='Ventanilla').order_by('-timestamp').first()
         plataforma = Registro.objects.filter(agencia=agencia.nom_age, area='Plataforma').order_by('-timestamp').first()
-        
+
         if ventanilla:
             data['ventanilla'].update({
-                'contratados': ventanilla.contratados,
-                'conectados': ventanilla.conectados,
-                'vacaciones': ventanilla.vacaciones,
-                'bajas': ventanilla.bajas,
-                'otros_roles': ventanilla.otros_roles
+                'Contratados': ventanilla.contratados,
+                'Conectados': ventanilla.conectados,
+                'Nuevos': ventanilla.nuevos,
+                'Bajas Medicas': ventanilla.bajas_medicas,
+                'Remplazo Plataforma/RAC': ventanilla.remplazo_plataforma_rac,
+                'Externas y Autobancos': ventanilla.externas_y_autobancos,
+                'Promotor Offline': ventanilla.promotor_offline
             })
-        
+
         if plataforma:
             data['plataforma'].update({
-                'contratados': plataforma.contratados,
-                'conectados': plataforma.conectados,
-                'vacaciones': plataforma.vacaciones,
-                'bajas': plataforma.bajas,
-                'otros_roles': plataforma.otros_roles
+                'Contratados': plataforma.contratados,
+                'Conectados': plataforma.conectados,
+                'Nuevos': plataforma.nuevos,
+                'Bajas Medicas': plataforma.bajas_medicas,
+                'Remplazo Plataforma/RAC': plataforma.remplazo_plataforma_rac,
+                'Externas y Autobancos': plataforma.externas_y_autobancos,
+                'Promotor Offline': plataforma.promotor_offline
             })
-        
+
         agencias_datos.append(data)
 
     if request.method == 'POST':
@@ -89,20 +79,24 @@ def manage_view(request):
             Registro.objects.create(
                 agencia=data['agencia'].nom_age,
                 area='Ventanilla',
-                contratados=request.POST.get(f'contratados_vent_{data['agencia'].id_age}', 0),
-                conectados=request.POST.get(f'conectados_vent_{data['agencia'].id_age}', 0),
-                vacaciones=request.POST.get(f'vacaciones_vent_{data['agencia'].id_age}', 0),
-                bajas=request.POST.get(f'bajas_vent_{data['agencia'].id_age}', 0),
-                otros_roles=request.POST.get(f'otros_roles_vent_{data['agencia'].id_age}', 0)
+                contratados=request.POST.get(f'contratados_vent_{data["agencia"].id_age}', 0),
+                conectados=request.POST.get(f'conectados_vent_{data["agencia"].id_age}', 0),
+                nuevos=request.POST.get(f'nuevos_vent_{data["agencia"].id_age}', 0),
+                bajas_medicas=request.POST.get(f'bajas_medicas_vent_{data["agencia"].id_age}', 0),
+                remplazo_plataforma_rac=request.POST.get(f'remplazo_plataforma_rac_vent_{data["agencia"].id_age}', 0),
+                externas_y_autobancos=request.POST.get(f'externas_y_autobancos_vent_{data["agencia"].id_age}', 0),
+                promotor_offline=request.POST.get(f'promotor_offline_vent_{data["agencia"].id_age}', 0)
             )
             Registro.objects.create(
                 agencia=data['agencia'].nom_age,
                 area='Plataforma',
-                contratados=request.POST.get(f'contratados_plat_{data['agencia'].id_age}', 0),
-                conectados=request.POST.get(f'conectados_plat_{data['agencia'].id_age}', 0),
-                vacaciones=request.POST.get(f'vacaciones_plat_{data['agencia'].id_age}', 0),
-                bajas=request.POST.get(f'bajas_plat_{data['agencia'].id_age}', 0),
-                otros_roles=request.POST.get(f'otros_roles_plat_{data['agencia'].id_age}', 0)
+                contratados=request.POST.get(f'contratados_plat_{data["agencia"].id_age}', 0),
+                conectados=request.POST.get(f'conectados_plat_{data["agencia"].id_age}', 0),
+                nuevos=request.POST.get(f'nuevos_plat_{data["agencia"].id_age}', 0),
+                bajas_medicas=request.POST.get(f'bajas_medicas_plat_{data["agencia"].id_age}', 0),
+                remplazo_plataforma_rac=request.POST.get(f'remplazo_plataforma_rac_plat_{data["agencia"].id_age}', 0),
+                externas_y_autobancos=request.POST.get(f'externas_y_autobancos_plat_{data["agencia"].id_age}', 0),
+                promotor_offline=request.POST.get(f'promotor_offline_plat_{data["agencia"].id_age}', 0)
             )
         messages.success(request, 'Registro guardado con éxito')
 
@@ -111,14 +105,19 @@ def manage_view(request):
         'last_update': Registro.objects.latest('timestamp').timestamp if Registro.objects.exists() else None
     })
 
+
 def download_csv(request):
     registros = Registro.objects.all()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=registros_agencias.csv'
 
     writer = csv.writer(response)
-    writer.writerow(['Agencia', 'Área', 'Contratados', 'Conectados', 'Vacaciones', 'Bajas', 'Otros Roles', 'Timestamp'])
+    writer.writerow(
+        ['Agencia', 'Área', 'Contratados', 'Conectados', 'Nuevos', 'Bajas Medicas', 'Remplazo Plataforma/RAC',
+         'Externas y Autobancos', 'Promotor Offline', 'Timestamp'])
     for registro in registros:
-        writer.writerow([registro.agencia, registro.area, registro.contratados, registro.conectados, registro.vacaciones, registro.bajas, registro.otros_roles, registro.timestamp])
+        writer.writerow([registro.agencia, registro.area, registro.contratados, registro.conectados, registro.nuevos,
+                         registro.bajas_medicas, registro.remplazo_plataforma_rac, registro.externas_y_autobancos,
+                         registro.promotor_offline, registro.timestamp])
 
     return response
