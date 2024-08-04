@@ -6,6 +6,18 @@ from .models import Agencia, Registro
 import csv
 from io import StringIO
 
+
+def some_view(request):
+    user_name = request.user.username  # Asegúrate de que el usuario esté autenticado
+    context = {
+        'user_name': user_name,
+        'last_update': '2024-08-02',  # Ejemplo, debería ser dinámico
+        'agencias_datos': [],  # Otros datos necesarios para la plantilla
+        'messages': [],  # Otros mensajes necesarios para la plantilla
+    }
+    return render(request, 'template.html', context)
+
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
