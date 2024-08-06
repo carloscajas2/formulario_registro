@@ -4,7 +4,7 @@ def create_test_users():
     users = [
         {"username": "centro", "password": "diegofuentes"},
         {"username": "occidente", "password": "rolandocarpio"},
-        {"username": "oriente", "password": "jhanniocortez"},
+        {"username": "oriente", "password": "jhanniozardan"},
         {"username": "supervisor", "password": "alejandraparada"},
     ]
 
