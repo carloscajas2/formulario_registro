@@ -43,11 +43,11 @@ def manage_view(request):
         data = {
             'agencia': agencia,
             'ventanilla': {
-                'contratados': 0, 'conectados': 0, 'nuevos': 0, 'bajas_medicas': 0, 'remplazo_plataforma_rac': 0,
+                'contratados_optimos': 0,'contratados': 0, 'vacaciones': 0, 'conectados': 0, 'nuevos': 0, 'bajas_medicas': 0, 'remplazo_plataforma_rac': 0,
                 'externas_y_autobancos': 0, 'promotor_offline': 0
             },
             'plataforma': {
-                'contratados': 0, 'conectados': 0, 'nuevos': 0, 'bajas_medicas': 0, 'remplazo_plataforma_rac': 0,
+                'contratados_optimos': 0, 'contratados': 0, 'vacaciones': 0, 'conectados': 0, 'nuevos': 0, 'bajas_medicas': 0, 'remplazo_plataforma_rac': 0,
                 'externas_y_autobancos': 0, 'promotor_offline': 0
             }
         }
@@ -56,7 +56,9 @@ def manage_view(request):
 
         if ventanilla:
             data['ventanilla'].update({
+                'contratados_optimos': ventanilla.contratados_optimos,
                 'contratados': ventanilla.contratados,
+                'vacaciones': ventanilla.vacaciones,
                 'conectados': ventanilla.conectados,
                 'nuevos': ventanilla.nuevos,
                 'bajas_medicas': ventanilla.bajas_medicas,
@@ -67,7 +69,9 @@ def manage_view(request):
 
         if plataforma:
             data['plataforma'].update({
+                'contratados_optimos': plataforma.contratados_optimos,
                 'contratados': plataforma.contratados,
+                'vacaciones': plataforma.vacaciones,
                 'conectados': plataforma.conectados,
                 'nuevos': plataforma.nuevos,
                 'bajas_medicas': plataforma.bajas_medicas,
@@ -81,20 +85,24 @@ def manage_view(request):
     if request.method == 'POST':
         for data in agencias_datos:
             Registro.objects.create(
-                agencia=data['agencia'].nom_age,
-                area='Ventanilla',
-                contratados=request.POST.get(f'contratados_vent_{data["agencia"].id_age}', 0),
-                conectados=request.POST.get(f'conectados_vent_{data["agencia"].id_age}', 0),
-                nuevos=request.POST.get(f'nuevos_vent_{data["agencia"].id_age}', 0),
-                bajas_medicas=request.POST.get(f'bajas_medicas_vent_{data["agencia"].id_age}', 0),
-                remplazo_plataforma_rac=request.POST.get(f'remplazo_plataforma_rac_vent_{data["agencia"].id_age}', 0),
-                externas_y_autobancos=request.POST.get(f'externas_y_autobancos_vent_{data["agencia"].id_age}', 0),
-                promotor_offline=request.POST.get(f'promotor_offline_vent_{data["agencia"].id_age}', 0)
+                agencia = data['agencia'].nom_age,
+                area = 'Ventanilla',
+                contratados_optimos=request.POST.get(f'contratados_optimos_vent_{data["agencia"].id_age}', 0),
+                contratados = request.POST.get(f'contratados_vent_{data["agencia"].id_age}', 0),
+                vacaciones=request.POST.get(f'vacaciones_vent_{data["agencia"].id_age}', 0),
+                conectados = request.POST.get(f'conectados_vent_{data["agencia"].id_age}', 0),
+                nuevos = request.POST.get(f'nuevos_vent_{data["agencia"].id_age}', 0),
+                bajas_medicas = request.POST.get(f'bajas_medicas_vent_{data["agencia"].id_age}', 0),
+                remplazo_plataforma_rac = request.POST.get(f'remplazo_plataforma_rac_vent_{data["agencia"].id_age}', 0),
+                externas_y_autobancos = request.POST.get(f'externas_y_autobancos_vent_{data["agencia"].id_age}', 0),
+                promotor_offline = request.POST.get(f'promotor_offline_vent_{data["agencia"].id_age}', 0)
             )
             Registro.objects.create(
                 agencia=data['agencia'].nom_age,
                 area='Plataforma',
+                contratados_optimos=request.POST.get(f'contratados_optimos_plat_{data["agencia"].id_age}', 0),
                 contratados=request.POST.get(f'contratados_plat_{data["agencia"].id_age}', 0),
+                vacaciones=request.POST.get(f'vacaciones_plat_{data["agencia"].id_age}', 0),
                 conectados=request.POST.get(f'conectados_plat_{data["agencia"].id_age}', 0),
                 nuevos=request.POST.get(f'nuevos_plat_{data["agencia"].id_age}', 0),
                 bajas_medicas=request.POST.get(f'bajas_medicas_plat_{data["agencia"].id_age}', 0),
@@ -117,6 +125,8 @@ def download_excel(request):
             strftime('%Y-%m-%d', datetime(timestamp, '-4 hours')) as fecha,
             area,
             contratados,
+            contratados_optimos, 
+            vacaciones,
             conectados,
             bajas_medicas,
             nuevos,
@@ -138,6 +148,8 @@ def download_excel(request):
         fecha,
         area as canal,
         contratados,
+        contratados_optimos, 
+        vacaciones,
         conectados,
         bajas_medicas,
         nuevos,
@@ -165,6 +177,8 @@ def download_excel(request):
             strftime('%Y-%m-%d', datetime(timestamp, '-4 hours')) as fecha,
             area,
             contratados,
+            contratados_optimos, 
+            vacaciones,
             conectados,
             bajas_medicas,
             nuevos,
@@ -187,6 +201,8 @@ def download_excel(request):
             fecha,
             area,
             contratados,
+            contratados_optimos, 
+            vacaciones,
             conectados,
             bajas_medicas,
             nuevos,
@@ -202,6 +218,8 @@ def download_excel(request):
         region,
         area, 
         sum(contratados) as total_contratados,
+        sum(contratados_optimos) as total_contratados_optimos,
+        sum(vacaciones) as total_vacaciones,
         sum(conectados) as total_conectados,
         sum(bajas_medicas) as total_bajas_medicas,
         sum(nuevos) as total_nuevos,

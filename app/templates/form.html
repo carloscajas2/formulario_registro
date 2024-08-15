@@ -92,12 +92,20 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ data.agencia.nom_age }}</h5>
                             <div class="mb-3">
+                                <label for="contratados_optimos_vent_{{ data.agencia.id_age }}" class="form-label">Contratados Optimos:</label>
+                                <input type="number" class="form-control" id="contratados_optimos_vent_{{ data.agencia.id_age }}" name="contratados_optimos_vent_{{ data.agencia.id_age }}" value="{{ data.ventanilla.contratados_optimos }}" required>
+                            </div>
+                            <div class="mb-3">
                                 <label for="contratados_vent_{{ data.agencia.id_age }}" class="form-label">Contratados:</label>
                                 <input type="number" class="form-control" id="contratados_vent_{{ data.agencia.id_age }}" name="contratados_vent_{{ data.agencia.id_age }}" value="{{ data.ventanilla.contratados }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="conectados_vent_{{ data.agencia.id_age }}" class="form-label">Conectados:</label>
                                 <input type="number" class="form-control" id="conectados_vent_{{ data.agencia.id_age }}" name="conectados_vent_{{ data.agencia.id_age }}" value="{{ data.ventanilla.conectados }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="vacaciones_vent_{{ data.agencia.id_age }}" class="form-label">Vacaciones:</label>
+                                <input type="number" class="form-control" id="vacaciones_vent_{{ data.agencia.id_age }}" name="vacaciones_vent_{{ data.agencia.id_age }}" value="{{ data.ventanilla.vacaciones }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="nuevos_vent_{{ data.agencia.id_age }}" class="form-label">Nuevos:</label>
@@ -137,8 +145,16 @@
                                 <input type="number" class="form-control" id="contratados_plat_{{ data.agencia.id_age }}" name="contratados_plat_{{ data.agencia.id_age }}" value="{{ data.plataforma.contratados }}" required>
                             </div>
                             <div class="mb-3">
+                                <label for="contratados_optimos_plat_{{ data.agencia.id_age }}" class="form-label">Contratados Óptimos:</label>
+                                <input type="number" class="form-control" id="contratados_optimos_plat_{{ data.agencia.id_age }}" name="contratados_optimos_plat_{{ data.agencia.id_age }}" value="{{ data.plataforma.contratados_optimos }}" required>
+                            </div>
+                            <div class="mb-3">
                                 <label for="conectados_plat_{{ data.agencia.id_age }}" class="form-label">Conectados:</label>
                                 <input type="number" class="form-control" id="conectados_plat_{{ data.agencia.id_age }}" name="conectados_plat_{{ data.agencia.id_age }}" value="{{ data.plataforma.conectados }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="vacaciones_plat_{{ data.agencia.id_age }}" class="form-label">Vacaciones:</label>
+                                <input type="number" class="form-control" id="vacaciones_plat_{{ data.agencia.id_age }}" name="vacaciones_plat{{ data.agencia.id_age }}" value="{{ data.plataforma.vacaciones }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="nuevos_plat_{{ data.agencia.id_age }}" class="form-label">Nuevos:</label>

@@ -10,6 +10,7 @@ class Registro(models.Model):
     agencia = models.CharField(max_length=50)
     area = models.CharField(max_length=50)
     contratados = models.IntegerField(default=0)
+    contratados_optimos = models.IntegerField(default=0)
     conectados = models.IntegerField(default=0)
     vacaciones = models.IntegerField(default=0)
     nuevos = models.IntegerField(default=0)  # Nuevo campo con valor predeterminado
